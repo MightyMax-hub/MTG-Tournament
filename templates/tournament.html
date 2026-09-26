@@ -1,0 +1,726 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<div class="page-header">
+
+    {% if changed %}
+
+    <div class="notice-box">
+
+        <strong>
+            Ergebnis wurde geändert.
+        </strong>
+
+        <p>
+            Die Wertung wurde neu berechnet.
+            Noch nicht gespielte spätere Runden wurden
+            automatisch neu gepaart.
+        </p>
+
+        <p>
+            Bereits gespielte spätere Runden wurden
+            nicht verändert.
+        </p>
+
+    </div>
+
+    {% endif %}
+
+    <div>
+
+        <h1>
+            {{ tournament.name }}
+        </h1>
+
+        {% if tournament.series_name %}
+
+            <p>
+                Turnierserie:
+                <strong>
+                    <a
+                        href="{{ url_for(
+                            'series.show_series',
+                            series_id=tournament.series_id
+                        ) }}"
+                    >
+                        {{ tournament.series_name }}
+                    </a>
+                </strong>
+            </p>
+
+        {% endif %}
+
+    </div>
+
+
+    <div>
+
+        {% if tournament.status == "planned" %}
+
+            <form
+                method="post"
+                action="{{ url_for(
+                    'tournaments.start_tournament',
+                    tournament_id=tournament.id
+                ) }}"
+            >
+
+                <button
+                    type="submit"
+                    class="primary-button start-button"
+                >
+                    Runde 1 erstellen
+                </button>
+
+            </form>
+
+        {% elif tournament.status == "running" %}
+
+            <div class="status-badge status-running">
+                Turnier läuft
+            </div>
+
+        {% elif tournament.status == "finished" %}
+
+            <div class="status-badge status-finished">
+                Turnier beendet
+            </div>
+
+        {% endif %}
+
+    </div>
+
+</div>
+
+
+<!-- ================================= -->
+<!-- TURNIERINFORMATIONEN -->
+<!-- ================================= -->
+
+<div class="tournament-info-grid">
+
+    <div class="info-card">
+
+        <span class="info-label">
+            Format
+        </span>
+
+        <strong>
+            {{ tournament.format }}
+        </strong>
+
+    </div>
+
+
+    <div class="info-card">
+
+        <span class="info-label">
+            Datum
+        </span>
+
+        <strong>
+            {{ tournament.tournament_date }}
+        </strong>
+
+    </div>
+
+
+    <div class="info-card">
+
+        <span class="info-label">
+            Runden
+        </span>
+
+        <strong>
+            {{ tournament.rounds }}
+        </strong>
+
+    </div>
+
+
+    <div class="info-card">
+
+        <span class="info-label">
+            Teilnehmer
+        </span>
+
+        <strong>
+            {{ tournament_players|length }}
+        </strong>
+
+    </div>
+
+</div>
+
+<!-- ================================= -->
+<!-- AKTUELLE RUNDE -->
+<!-- ================================= -->
+
+{% if current_round %}
+<div class="section-card">
+
+    <div class="section-header tournament-round-header">
+
+        <div>
+            <h2>
+                Runde {{ current_round.round_number }}
+            </h2>
+
+            <p>
+                Paarungen und Ergebnisse
+            </p>
+        </div>
+
+        <div class="round-actions">
+	    
+            {% if tournament.format in [
+                "Draft",
+                "Sealed",
+                "Top 8",
+                "Top 8 Draft",
+                "Top 8 Sealed"
+            ] %}
+
+            <a
+                href="{{ url_for(
+                    'tournaments.seating',
+                    tournament_id=tournament.id
+                ) }}"
+                class="secondary-button"
+            >
+                Sitzordnung
+            </a>
+
+            {% endif %}
+
+	    <a
+    		href="{{ 
+		    url_for(
+        		'tournaments.standings',
+        		tournament_id=tournament.id
+    		    )
+		}}"
+    		class="secondary-button"
+	    >
+    		Spielerwertung
+	    </a>
+
+            <a
+                href="{{
+                    url_for(
+                        'tournaments.tournament',
+                        tournament_id=tournament.id,
+                        edit=1
+                    )
+                }}"
+                class="secondary-button"
+            >
+                Ergebnisse bearbeiten
+            </a>
+		
+	    <form
+    		method="post"
+    		action="{{ url_for(
+        	    'tournaments.finish_round',
+        	    tournament_id=tournament.id
+    	   	) }}"
+	    >
+    	    	<button
+        	    type="submit"
+        	    class="primary-button"
+    	    	>
+        	    Runde abschließen
+    	    	</button>
+	    </form>
+
+        </div>
+
+    </div>
+
+
+    <div class="match-list">
+
+        {% for match in matches %}
+
+            <div class="match-card
+                {% if match.result == 'bye' %}
+                    bye-match
+                {% elif match.result %}
+                    match-completed
+                {% endif %}
+            ">
+
+                <div class="table-number">
+                    Tisch {{ match.table_number }}
+                </div>
+
+
+                <div class="match-players">
+
+                    <strong>
+                        {{ match.player1_name }}
+                    </strong>
+
+                    {% if match.result == "bye" %}
+
+                        <span class="match-vs">
+                            BYE
+                        </span>
+
+                    {% else %}
+
+                        <span class="match-vs">
+                            vs.
+                        </span>
+
+                        <strong>
+                            {{ match.player2_name }}
+                        </strong>
+
+                    {% endif %}
+
+                </div>
+
+
+                <div class="match-result">
+
+                    {% if match.result == "bye" %}
+
+                        2 : 0
+
+                    {% elif match.result %}
+
+                        {{ match.player1_games }}
+                        :
+                        {{ match.player2_games }}
+
+                    {% else %}
+
+                        offen
+
+                    {% endif %}
+
+                </div>
+
+
+                {% if match.result != "bye" %}
+
+                    {% if not match.result or edit_results %}
+
+                        <div class="match-entry">
+
+                            <form
+                                method="post"
+                                action="{{
+                                    url_for(
+                                        'tournaments.enter_match_result',
+                                        tournament_id=tournament.id,
+                                        match_id=match.id
+                                    )
+                                }}"
+                            >
+				
+				<input
+    				    type="hidden"
+    				    name="edit_mode"
+    				    value="{% if edit_results %}1{% else %}0{% endif %}"
+				>
+
+                                <div class="game-inputs">
+
+                                   <label>
+                                       <input
+                                           type="number"
+                                           name="player1_games"
+                                           aria-label="Spiele von {{ match.player1_name }}"
+                                           min="0"
+                                           max="2"
+                                           value="{% if match.result %}{{ match.player1_games }}{% else %}0{% endif %}"
+                                       >
+                                   </label>
+
+                                   <span class="game-colon">
+                                       :
+                                   </span>
+
+                                   <label>
+                                       <input
+                                           type="number"
+                                           name="player2_games"
+                                           aria-label="Spiele von {{ match.player2_name }}"
+                                           min="0"
+                                           max="2"
+                                           value="{% if match.result %}{{ match.player2_games }}{% else %}0{% endif %}"
+                                       >
+                                   </label>
+
+                                   <button
+                                       type="submit"
+                                       name="result"
+                                       value="submit"
+                                       class="result-button submit-result-button"
+                                   >
+                                       Ergebnis übermitteln
+                                   </button>
+
+                               </div>
+
+                            </form>
+
+                        </div>
+
+                    {% else %}
+
+                        <div class="match-submitted">
+                            ✓ Ergebnis übermittelt
+                        </div>
+
+                    {% endif %}
+
+                {% endif %}
+
+            </div>
+
+        {% endfor %}
+
+    </div>
+
+</div>
+{% endif %}
+
+<!-- ================================= -->
+<!-- Vergangene Runden -->
+<!-- ================================= -->
+{% if past_rounds %}
+
+<div class="section-card">
+
+    <div class="section-header">
+        <h2>Vergangene Runden</h2>
+        <p>
+            Ergebnisse bereits gespielter Runden
+        </p>
+    </div>
+
+    <div class="past-rounds">
+
+        {% for past_round in past_rounds %}
+
+        <details
+            class="past-round"
+            id="round-{{ past_round.round_number }}"
+            {% if edit_results %}open{% endif %}
+        >
+
+            <summary>
+
+                <span>
+                    Runde {{ past_round.round_number }}
+                </span>
+
+                <span class="past-round-status">
+                    Abgeschlossen
+                </span>
+
+            </summary>
+
+
+            <div class="past-round-content">
+
+                {% for match in past_round_matches[past_round.id] %}
+
+                <div
+                    class="
+                        match-card
+                        {% if match.result %}
+                            match-completed
+                        {% endif %}
+                    "
+                >
+
+                    <div class="table-number">
+                        Tisch {{ match.table_number }}
+                    </div>
+
+
+                    <div class="match-players">
+
+                        <strong>
+                            {{ match.player1_name }}
+                        </strong>
+
+                        <span class="match-vs">
+                            vs.
+                        </span>
+
+                        <strong>
+                            {{ match.player2_name }}
+                        </strong>
+
+                    </div>
+
+
+                    {% if match.result == "bye" %}
+
+                        <div class="match-result">
+                            Bye
+                        </div>
+
+                    {% elif edit_results %}
+
+                        <form
+                            method="post"
+                            action="{{ url_for(
+                                'tournaments.enter_match_result',
+                                tournament_id=tournament.id,
+                                match_id=match.id
+                            ) }}"
+                        >
+
+                            <input
+                                type="hidden"
+                                name="edit_mode"
+                                value="1"
+                            >
+
+                            <div class="game-inputs">
+
+                                <label>
+                                    <input
+                                        type="number"
+                                        name="player1_games"
+                                        aria-label="Spiele von {{ match.player1_name }}"
+                                        min="0"
+                                        max="2"
+                                        value="{{ match.player1_games if match.player1_games is not none else 0 }}"
+                                    >
+                                </label>
+
+                                <span class="game-colon">
+                                    :
+                                </span>
+
+                                <label>
+                                    <input
+                                        type="number"
+                                        name="player2_games"
+                                        aria-label="Spiele von {{ match.player2_name }}"
+                                        min="0"
+                                        max="2"
+                                        value="{{ match.player2_games if match.player2_games is not none else 0 }}"
+                                    >
+                                </label>
+
+                                <button
+                                    type="submit"
+                                    name="result"
+                                    value="submit"
+                                    class="result-button submit-result-button"
+                                >
+                                    Ergebnis übermitteln
+                                </button>
+
+                            </div>
+
+                        </form>
+
+                    {% else %}
+
+                        <div class="match-result">
+
+                            {{ match.player1_games }}
+                            :
+                            {{ match.player2_games }}
+
+                        </div>
+
+                    {% endif %}
+
+                </div>
+
+                {% endfor %}
+
+            </div>
+
+        </details>
+
+        {% endfor %}
+
+    </div>
+
+</div>
+
+{% endif %}
+
+<!-- ================================= -->
+<!-- TEILNEHMER -->
+<!-- ================================= -->
+
+<div class="section-card">
+
+    <div class="section-header">
+
+        <div>
+
+            <h2>
+                Teilnehmer
+            </h2>
+
+            <p>
+                {{ tournament_players|length }}
+                Spieler
+            </p>
+
+        </div>
+
+    </div>
+
+
+    {% if tournament.status == "planned" and not tournament.format.startswith("Top 8") %}
+
+        {% if tournament.series_id and series_players %}
+
+            <div class="import-box">
+
+                <div>
+
+                    <strong>
+                        Spieler aus der Turnierserie
+                    </strong>
+
+                    <p>
+                        {{ series_players|length }}
+                        weitere Spieler sind in der Serie eingetragen.
+                    </p>
+
+                </div>
+
+
+                <form
+                    method="post"
+                    action="{{ url_for(
+                        'tournaments.import_series_players',
+                        tournament_id=tournament.id
+                    ) }}"
+                >
+
+                    <button
+                        type="submit"
+                        class="primary-button"
+                    >
+                        Teilnehmer übernehmen
+                    </button>
+
+                </form>
+
+            </div>
+
+        {% endif %}
+
+
+        {% if available_players %}
+
+            <form
+                method="post"
+                action="{{ url_for(
+                    'tournaments.add_player',
+                    tournament_id=tournament.id
+                ) }}"
+                class="inline-form"
+            >
+
+                <select
+                    name="player_id"
+                    required
+                >
+
+                    <option value="">
+                        Spieler auswählen
+                    </option>
+
+                    {% for player in available_players %}
+
+                        <option value="{{ player.id }}">
+                            {{ player.name }}
+                        </option>
+
+                    {% endfor %}
+
+                </select>
+
+
+                <button
+                    type="submit"
+                    class="primary-button"
+                >
+                    + Spieler hinzufügen
+                </button>
+
+            </form>
+
+        {% endif %}
+
+    {% endif %}
+
+
+    {% if tournament_players %}
+
+        <div class="player-list">
+
+            {% for player in tournament_players %}
+
+                <div class="player-list-item">
+
+                    <strong>
+                        {{ player.name }}
+                    </strong>
+
+
+                    {% if (
+                        tournament.status == "planned"
+                        and not tournament.format.startswith("Top 8")
+                    ) %}
+
+                        <form
+                            method="post"
+                            action="{{ url_for(
+                                'tournaments.remove_player',
+                                tournament_id=tournament.id
+                            ) }}"
+                        >
+
+                            <input
+                                type="hidden"
+                                name="player_id"
+                                value="{{ player.id }}"
+                            >
+
+                            <button
+                                type="submit"
+                                class="danger-button"
+                            >
+                                Entfernen
+                            </button>
+
+                        </form>
+
+                    {% endif %}
+
+                </div>
+
+            {% endfor %}
+
+        </div>
+
+    {% else %}
+
+        <div class="empty-state">
+            Noch keine Teilnehmer vorhanden.
+        </div>
+
+    {% endif %}
+
+</div>
+
+{% endblock %}

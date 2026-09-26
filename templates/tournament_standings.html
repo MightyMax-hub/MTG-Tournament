@@ -1,0 +1,195 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<div class="page-header">
+
+    <div>
+        <h1>Spielerwertung</h1>
+
+        <p>
+            {{ tournament.name }}
+
+            {% if tournament.series_name %}
+                ·
+                <a
+                    href="{{ url_for(
+                        'series.show_series',
+                        series_id=tournament.series_id
+                    ) }}"
+                >
+                    {{ tournament.series_name }}
+                </a>
+            {% endif %}
+        </p>
+    </div>
+
+    <div class="round-actions">
+
+        <a
+            href="{{ url_for(
+                'tournaments.tournament',
+                tournament_id=tournament.id
+            ) }}"
+            class="secondary-button"
+        >
+            Paarungen
+        </a>
+
+        {% if tournament.status == "running" %}
+
+        <a
+            href="{{ url_for(
+                'tournaments.tournament',
+                tournament_id=tournament.id,
+                edit=1
+            ) }}"
+            class="secondary-button"
+        >
+            Ergebnisse bearbeiten
+        </a>
+
+        {% endif %}
+
+    </div>
+
+</div>
+
+
+<div class="section-card">
+
+    <div class="section-header">
+
+        <h2>Aktuelle Wertung</h2>
+
+        <p>
+            Punkte und Spielergebnisse dieses Turniers
+        </p>
+
+    </div>
+
+
+    <div class="table-container">
+
+        <table class="player-table standings-table">
+
+            <thead>
+
+                <tr>
+
+                    <th>
+                        Platz
+                    </th>
+
+                    <th>
+                        Spieler
+                    </th>
+
+                    <th>
+                        Punkte
+                    </th>
+
+		    <th>
+            		OMW%
+        	    </th>
+
+                    <th>
+                        GW%
+                    </th>
+
+                    <th>
+                        OGW%
+                    </th>
+
+                    <th>
+                        Siege
+                    </th>
+
+                    <th>
+                        Niederlagen
+                    </th>
+
+                    <th>
+                        Unentschieden
+                    </th>
+
+                </tr>
+
+            </thead>
+
+
+            <tbody>
+
+                {% for player in standings %}
+
+                <tr>
+
+    		    <td class="standings-rank">
+            		{{ player.rank }}
+    		    </td>
+
+    		    <td class="standings-player">
+        		    {{ player.name }}
+    		    </td>
+
+    		    <td class="standings-points">
+        		    <strong>
+            		    {{ player.points }}
+        		    </strong>
+    		    </td>
+
+    		    <td>
+        		    {{ "%.1f"|format(
+            		    player.opponent_match_win_percentage * 100
+        		    ) }} %
+    		    </td>
+
+    		    <td>
+        		    {{ "%.1f"|format(
+            		    player.game_win_percentage * 100
+        		    ) }} %
+    		    </td>
+
+    		    <td>
+        		    {{ "%.1f"|format(
+            		    player.opponent_game_win_percentage * 100
+        		    ) }} %
+    		    </td>
+
+    		    <td>
+        		    {{ player.wins }}
+    		    </td>
+
+    		    <td>
+        		    {{ player.losses }}
+    		    </td>
+
+    		    <td>
+        		    {{ player.draws }}
+    		    </td>
+
+		</tr>
+                {% else %}
+
+                <tr>
+
+                    <td
+                        colspan="9"
+                        class="empty-state"
+                    >
+                        Noch keine Spieler vorhanden.
+                    </td>
+
+                </tr>
+
+                {% endfor %}
+
+            </tbody>
+
+        </table>
+
+    </div>
+
+</div>
+
+{% endblock %}

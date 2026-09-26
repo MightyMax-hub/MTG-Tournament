@@ -1,0 +1,49 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<div class="page-header">
+
+    <h1>Neuen Spieler anlegen</h1>
+
+</div>
+
+
+<div class="form-card">
+
+    {% if error %}
+
+        <div class="error">
+            {{ error }}
+        </div>
+
+    {% endif %}
+
+
+    <form method="post">
+
+        <label for="name">
+            Spielername
+        </label>
+
+        <input
+            type="text"
+            id="name"
+            name="name"
+            required
+            autofocus
+        >
+
+
+        <button
+            type="submit"
+            class="primary-button"
+        >
+            Spieler anlegen
+        </button>
+
+    </form>
+
+</div>
+
+{% endblock %}

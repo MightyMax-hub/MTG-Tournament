@@ -1,0 +1,328 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<div class="page-header">
+
+    <div>
+
+        <h1>
+            {{ series.name }}
+        </h1>
+
+        {% if series.description %}
+
+            <p>
+                {{ series.description }}
+            </p>
+
+        {% endif %}
+
+    </div>
+
+    <div class="round-actions">
+
+        <a
+            href="{{ url_for(
+                'series.standings',
+                series_id=series.id
+            ) }}"
+            class="secondary-button"
+        >
+            Spielerwertung
+        </a>
+
+        <a
+            href="{{ url_for(
+                'series.create_top8',
+                series_id=series.id
+            ) }}"
+            class="primary-button"
+        >
+            + Top 8 anlegen
+        </a>
+
+        <a
+            href="{{ url_for(
+                'tournaments.new_tournament',
+                series_id=series.id
+            ) }}"
+            class="primary-button"
+        >
+            + Turnier anlegen
+        </a>
+
+    </div>
+
+</div>
+
+
+<div class="series-detail-sections">
+
+<!-- ============================= -->
+<!-- SERIENTEILNEHMER -->
+<!-- ============================= -->
+
+<div class="section-card series-players-section">
+
+    <div class="section-header">
+
+        <div>
+            <h2>Teilnehmer</h2>
+
+            <p>
+                Spieler, die grundsätzlich an dieser Turnierserie teilnehmen.
+            </p>
+        </div>
+
+    </div>
+
+
+    {% if available_players %}
+
+    <form
+        method="post"
+        action="{{ url_for(
+            'series.add_player',
+            series_id=series.id
+        ) }}"
+        class="inline-form"
+    >
+
+        <select
+            name="player_id"
+            required
+        >
+
+            <option value="">
+                Spieler auswählen
+            </option>
+
+            {% for player in available_players %}
+
+                <option value="{{ player.id }}">
+                    {{ player.name }}
+                </option>
+
+            {% endfor %}
+
+        </select>
+
+
+        <button
+            type="submit"
+            class="primary-button"
+        >
+            + Spieler hinzufügen
+        </button>
+
+    </form>
+
+    {% endif %}
+
+
+    {% if series_players %}
+
+        <div class="player-list">
+
+            {% for player in series_players %}
+
+                <div class="player-list-item">
+
+                    <strong>
+                        {{ player.name }}
+                    </strong>
+
+
+                    <form
+                        method="post"
+                        action="{{ url_for(
+                            'series.remove_player',
+                            series_id=series.id
+                        ) }}"
+                    >
+
+                        <input
+                            type="hidden"
+                            name="player_id"
+                            value="{{ player.id }}"
+                        >
+
+                        <button
+                            type="submit"
+                            class="danger-button"
+                        >
+                            Entfernen
+                        </button>
+
+                    </form>
+
+                </div>
+
+            {% endfor %}
+
+        </div>
+
+    {% else %}
+
+        <div class="empty-state">
+            Noch keine Teilnehmer hinzugefügt.
+        </div>
+
+    {% endif %}
+
+</div>
+
+
+<!-- ============================= -->
+<!-- TURNIERE -->
+<!-- ============================= -->
+
+<div class="section-card series-tournaments-section">
+
+    <div class="section-header">
+
+        <div>
+
+            <h2>Turniere</h2>
+
+            <p>
+                Turniere dieser Serie.
+            </p>
+
+        </div>
+
+    </div>
+
+
+    <div class="table-container">
+
+        <table class="player-table">
+
+            <thead>
+
+                <tr>
+
+                    <th>
+                        Turnier
+                    </th>
+
+                    <th>
+                        Datum
+                    </th>
+
+                    <th>
+                        Format
+                    </th>
+
+                    <th>
+                        Runden
+                    </th>
+
+                    <th>
+                        Top 8
+                    </th>
+
+                    <th>
+                        Status
+                    </th>
+
+                </tr>
+
+            </thead>
+
+
+            <tbody>
+
+                {% for tournament in tournaments %}
+
+                <tr>
+
+                    <td>
+
+                        <a
+                            href="{{ url_for(
+                                'tournaments.tournament',
+                                tournament_id=tournament.id
+                            ) }}"
+                        >
+
+                            <strong>
+                                {{ tournament.name }}
+                            </strong>
+
+                        </a>
+
+                    </td>
+
+
+                    <td>
+                        {{ tournament.tournament_date }}
+                    </td>
+
+
+                    <td>
+                        {{ tournament.format }}
+                    </td>
+
+
+                    <td>
+                        {{ tournament.rounds }}
+                    </td>
+
+
+                    <td>
+
+                        {% if tournament.counts_for_top8 %}
+
+                            ✓
+
+                        {% else %}
+
+                            –
+
+                        {% endif %}
+
+                    </td>
+
+
+                    <td>
+                        {% if tournament.status == "planned" %}
+                            geplant
+                        {% elif tournament.status == "running" %}
+                            aktiv
+                        {% elif tournament.status == "finished" %}
+                            beendet
+                        {% else %}
+                            {{ tournament.status }}
+                        {% endif %}
+                    </td>
+
+                </tr>
+
+                {% else %}
+
+                <tr>
+
+                    <td
+                        colspan="6"
+                        class="empty-state"
+                    >
+                        Noch keine Turniere in dieser Serie.
+                    </td>
+
+                </tr>
+
+                {% endfor %}
+
+            </tbody>
+
+        </table>
+
+    </div>
+
+</div>
+
+</div>
+
+{% endblock %}

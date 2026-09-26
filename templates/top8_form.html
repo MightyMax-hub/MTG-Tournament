@@ -1,0 +1,149 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<div class="page-header">
+
+    <div>
+        <h1>Top 8 anlegen</h1>
+        <p>{{ series.name }}</p>
+    </div>
+
+</div>
+
+
+<div class="form-card">
+
+    {% if error %}
+
+        <div class="error">
+            {{ error }}
+        </div>
+
+        <a
+            href="{{ url_for(
+                'series.show_series',
+                series_id=series.id
+            ) }}"
+            class="secondary-button"
+        >
+            Zur Serie
+        </a>
+
+    {% else %}
+
+        <form method="post">
+
+            <label for="name">
+                Turniername
+            </label>
+
+            <input
+                type="text"
+                id="name"
+                name="name"
+                value="{{ series.name }} Top 8"
+                required
+            >
+
+            <label for="format">
+                Format
+            </label>
+
+            <select
+                id="format"
+                name="format"
+                onchange="toggleTop8Seating()"
+                required
+            >
+
+                {% for format in ["Draft", "Sealed", "Constructed"] %}
+
+                    <option
+                        value="{{ format }}"
+                        {% if selected_format == format %}selected{% endif %}
+                    >
+                        {{ format }}
+                    </option>
+
+                {% endfor %}
+
+            </select>
+
+            <p>
+                Single Elimination · Best of Three
+            </p>
+
+            <div id="top8-seating-settings">
+
+                <strong>
+                    Sitzordnung
+                </strong>
+
+                <p>
+                    Bei Draft und Sealed wird die Rangliste als Sitzordnung
+                    für die Top 8 verwendet.
+                </p>
+
+            </div>
+
+            <label>
+                Spieler
+            </label>
+
+            <div class="player-list">
+
+                    {% for player in seating_players %}
+
+                    <div class="player-list-item">
+
+                            {% if selected_format in ["Draft", "Sealed"] %}
+                                Sitz {{ loop.index }}:
+                            {% endif %}
+
+                        <strong>{{ player.rank }}. {{ player.name }}</strong>
+                    </div>
+
+                {% endfor %}
+
+            </div>
+
+            <label for="date">
+                Datum
+            </label>
+
+            <input
+                type="date"
+                id="date"
+                name="date"
+                required
+            >
+
+            <button
+                type="submit"
+                class="primary-button"
+            >
+                Top 8 anlegen
+            </button>
+
+        </form>
+
+    {% endif %}
+
+    </div>
+
+<script>
+
+function toggleTop8Seating() {
+
+    const format = document.getElementById("format").value;
+    const seating = document.getElementById("top8-seating-settings");
+
+    seating.hidden = format === "Constructed";
+}
+
+document.addEventListener("DOMContentLoaded", toggleTop8Seating);
+
+</script>
+
+{% endblock %}

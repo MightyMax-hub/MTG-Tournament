@@ -1,0 +1,76 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<h1>Dashboard</h1>
+
+<div class="dashboard-grid">
+
+    <div class="card">
+        <div class="card-number">
+            {{ player_count }}
+        </div>
+
+        <div>
+            Spieler
+        </div>
+
+        <a class="button"
+           href="{{ url_for('players.list_players') }}">
+            Spieler verwalten
+        </a>
+    </div>
+
+
+    <div class="card">
+
+        <h2>Turniere</h2>
+
+        {% if tournaments %}
+
+            {% for tournament in tournaments %}
+
+                <a
+                    class="tournament-link"
+                    href="{{
+                        url_for(
+                            'tournaments.tournament',
+                            tournament_id=tournament.id
+                        )
+                    }}"
+                >
+                    <div class="tournament-link-main">
+                        <strong>
+                            {{ tournament.name }}
+                        </strong>
+
+                        <span>
+                            {{ tournament.format }}
+                        </span>
+                    </div>
+
+                    <div class="tournament-link-meta">
+                        <span>
+                            {{ tournament.tournament_date }}
+                        </span>
+
+                        <span>
+                            {{ tournament.series_name or '' }}
+                        </span>
+                    </div>
+
+                </a>
+
+            {% endfor %}
+
+        {% else %}
+
+            <p>Noch keine Turniere.</p>
+
+        {% endif %}
+
+    </div>
+
+</div>
+
+{% endblock %}

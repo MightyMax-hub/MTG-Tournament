@@ -1,0 +1,184 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<h1>Turniere</h1>
+
+{% if show_form %}
+
+<form method="POST">
+
+    <label>
+        Turniername
+    </label>
+
+    <input
+        type="text"
+        name="name"
+        placeholder="Saturday Sealed"
+        required
+    >
+
+
+    <label>
+        Format
+    </label>
+
+    <select name="format">
+
+        <option value="Draft">
+            Draft
+        </option>
+
+        <option value="Sealed">
+            Sealed
+        </option>
+
+        <option value="Constructed">
+            Constructed
+        </option>
+
+    </select>
+
+
+    <label>
+        Datum
+    </label>
+
+    <input
+        type="date"
+        name="date"
+        required
+    >
+
+
+    <label>
+        Anzahl Runden
+    </label>
+
+    <input
+        type="number"
+        name="rounds"
+        value="3"
+        min="1"
+        max="20"
+        required
+    >
+
+
+    <button
+        class="button primary"
+        type="submit"
+    >
+        Turnier erstellen
+    </button>
+
+</form>
+
+<hr>
+
+{% endif %}
+
+
+<a
+    class="button primary"
+    href="{{ url_for('tournaments.new_tournament') }}"
+>
+    + Neues Turnier
+</a>
+
+
+<div class="table-container">
+
+<table>
+
+<thead>
+
+<tr>
+    <th>Serie</th>
+    <th>Turnier</th>
+    <th>Format</th>
+    <th>Datum</th>
+    <th>Runden</th>
+    <th>Status</th>
+</tr>
+
+</thead>
+
+<tbody>
+
+{% for tournament in tournaments %}
+
+<tr>
+
+<td>
+    {% if tournament.series_id %}
+
+        <a
+            href="{{ url_for(
+                'series.show_series',
+                series_id=tournament.series_id
+            ) }}"
+        >
+            {{ tournament.series_name }}
+        </a>
+
+    {% endif %}
+</td>
+
+<td>
+<a
+    href="{{
+        url_for(
+            'tournaments.tournament',
+            tournament_id=tournament.id
+        )
+    }}"
+>
+    {{ tournament.name }}
+</a>
+</td>
+
+<td>
+    {{ tournament.format }}
+</td>
+
+<td>
+    {{ tournament.tournament_date }}
+</td>
+
+<td>
+    {{ tournament.rounds }}
+</td>
+
+<td>
+    {% if tournament.status == "planned" %}
+        geplant
+    {% elif tournament.status == "running" %}
+        aktiv
+    {% elif tournament.status == "finished" %}
+        beendet
+    {% else %}
+        {{ tournament.status }}
+    {% endif %}
+</td>
+
+</tr>
+
+{% else %}
+
+<tr>
+    <td colspan="6">
+        Noch keine Turniere.
+    </td>
+</tr>
+
+{% endfor %}
+
+</tbody>
+
+</table>
+
+</div>
+
+{% endblock %}

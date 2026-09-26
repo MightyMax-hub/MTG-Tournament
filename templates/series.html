@@ -1,0 +1,117 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<div class="page-header">
+
+    <div>
+        <h1>Turnierserien</h1>
+        <p>Verwalte deine Turnierserien und Events.</p>
+    </div>
+
+    <a
+        href="{{ url_for('series.new_series') }}"
+        class="primary-button"
+    >
+        + Turnierserie anlegen
+    </a>
+
+</div>
+
+
+<div class="table-container">
+
+    <table class="player-table">
+
+        <thead>
+            <tr>
+                <th>Turnierserie</th>
+                <th>Zeitraum</th>
+                <th>Turniere</th>
+                <th>Status</th>
+            </tr>
+        </thead>
+
+
+        <tbody>
+
+            {% for item in series_list %}
+
+            <tr>
+
+                <td>
+
+                    <a
+                        href="{{ url_for(
+                            'series.show_series',
+                            series_id=item.id
+                        ) }}"
+                    >
+                        <strong>
+                            {{ item.name }}
+                        </strong>
+                    </a>
+
+                </td>
+
+
+                <td>
+
+                    {% if item.start_date %}
+
+                        {{ item.start_date }}
+
+                        {% if item.end_date %}
+                            – {{ item.end_date }}
+                        {% endif %}
+
+                    {% else %}
+
+                        –
+
+                    {% endif %}
+
+                </td>
+
+
+                <td>
+                    {{ item.tournament_count }}
+                </td>
+
+
+                <td>
+                    {% if item.status == "planned" %}
+                        geplant
+                    {% elif item.status == "running" %}
+                        aktiv
+                    {% elif item.status == "finished" %}
+                        beendet
+                    {% else %}
+                        {{ item.status }}
+                    {% endif %}
+                </td>
+
+            </tr>
+
+            {% else %}
+
+            <tr>
+
+                <td
+                    colspan="4"
+                    class="empty-state"
+                >
+                    Noch keine Turnierserien vorhanden.
+                </td>
+
+            </tr>
+
+            {% endfor %}
+
+        </tbody>
+
+    </table>
+
+</div>
+
+{% endblock %}

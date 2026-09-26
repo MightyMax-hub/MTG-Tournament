@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="de">
+
+<head>
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width,
+                 initial-scale=1.0,
+                 maximum-scale=1.0,
+                 user-scalable=no"
+    >
+
+    <title>MTG Tournament Manager</title>
+
+    <link
+        rel="stylesheet"
+        href="{{ url_for('static', filename='css/style.css') }}"
+    >
+</head>
+
+<body>
+
+<header>
+
+    <div class="header-content">
+
+        <div class="header-left">
+
+            <div class="header-title">
+                MTG Tournament Manager
+            </div>
+
+            <nav>
+
+    		<a href="{{ url_for('main.dashboard') }}">
+        		Dashboard
+    		</a>
+
+    		<a href="{{ url_for('players.list_players') }}">
+        		Spieler
+    		</a>
+
+    		<a href="{{ url_for('series.list_series') }}">
+        		Turnierserien
+    		</a>
+
+    		<a href="{{ url_for('tournaments.list_tournaments') }}">
+        		Turniere
+    		</a>
+
+	   </nav>
+
+        </div>
+
+
+        <img
+            class="header-logo"
+            src="{{ url_for('static', filename='images/MTG_GP_Stolpen.png') }}"
+            alt="MTG GP Stolpen"
+        >
+
+    </div>
+
+</header>
+
+
+<main>
+
+{% block content %}
+{% endblock %}
+
+</main>
+
+</body>
+</html>

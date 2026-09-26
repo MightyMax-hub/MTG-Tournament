@@ -1,0 +1,322 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<div class="page-header">
+
+    <div>
+        <h1>Spieler</h1>
+        <p>Gesamtstatistik über alle erfassten Turniere</p>
+    </div>
+
+    <a
+        href="{{ url_for('players.new_player') }}"
+        class="primary-button"
+    >
+        + Spieler hinzufügen
+    </a>
+
+</div>
+
+
+<div class="table-container">
+
+    <table class="player-table">
+
+        <thead>
+
+            <tr>
+
+                <th>
+                    Platz
+                </th>
+
+                <th>
+                    Spieler
+                </th>
+
+                {% for column in [
+                    ("points", "Punkte"),
+                    ("opponent-match-win-percentage", "OMW%"),
+                    ("game-win-percentage", "GW%"),
+                    ("opponent-game-win-percentage", "OGW%"),
+                    ("wins", "Wins"),
+                    ("losses", "Losses"),
+                    ("draws", "Ties")
+                ] %}
+
+                <th
+                    class="sortable"
+                    data-column="{{ column[0] }}"
+                    data-type="number"
+                >
+                    {{ column[1] }}
+                    <span class="sort-indicator"></span>
+                </th>
+
+                {% endfor %}
+
+                <th
+                    class="sortable"
+                    data-column="series-played"
+                    data-type="number"
+                >
+                    Serien
+                    <span class="sort-indicator"></span>
+                </th>
+
+                <th
+                    class="sortable"
+                    data-column="tournaments-played"
+                    data-type="number"
+                >
+                    Turniere
+                    <span class="sort-indicator"></span>
+                </th>
+
+            </tr>
+
+        </thead>
+
+
+        <tbody>
+
+            {% for player in players %}
+
+            <tr
+                data-points="{{ player.points }}"
+                data-opponent-match-win-percentage="{{ player.opponent_match_win_percentage }}"
+                data-game-win-percentage="{{ player.game_win_percentage }}"
+                data-opponent-game-win-percentage="{{ player.opponent_game_win_percentage }}"
+                data-wins="{{ player.wins }}"
+                data-losses="{{ player.losses }}"
+                data-draws="{{ player.draws }}"
+                data-series-played="{{ player.series_played }}"
+                data-tournaments-played="{{ player.tournaments_played }}"
+            >
+
+                <td>
+                    {{ player.rank }}
+                </td>
+
+                <td>
+                    <strong>{{ player.name }}</strong>
+                </td>
+
+                <td>
+                    <strong>{{ player.points }}</strong>
+                </td>
+
+                <td>
+                    {{ "%.1f"|format(
+                        player.opponent_match_win_percentage * 100
+                    ) }} %
+                </td>
+
+                <td>
+                    {{ "%.1f"|format(
+                        player.game_win_percentage * 100
+                    ) }} %
+                </td>
+
+                <td>
+                    {{ "%.1f"|format(
+                        player.opponent_game_win_percentage * 100
+                    ) }} %
+                </td>
+
+                <td>{{ player.wins }}</td>
+                <td>{{ player.losses }}</td>
+                <td>{{ player.draws }}</td>
+                <td>{{ player.series_played }}</td>
+                <td>{{ player.tournaments_played }}</td>
+
+            </tr>
+
+            {% else %}
+
+            <tr>
+
+                <td
+                    colspan="11"
+                    class="empty-state"
+                >
+                    Noch keine Spieler vorhanden.
+                </td>
+
+            </tr>
+
+            {% endfor %}
+
+        </tbody>
+
+    </table>
+
+</div>
+
+
+<script>
+
+document.addEventListener("DOMContentLoaded", function () {
+
+    const headers = document.querySelectorAll(
+        ".player-table th.sortable"
+    );
+
+    const tableBody = document.querySelector(
+        ".player-table tbody"
+    );
+
+    let currentColumn = null;
+    let currentDirection = "desc";
+
+
+    headers.forEach(function (header) {
+
+        header.addEventListener("click", function () {
+
+            const column =
+                header.dataset.column;
+
+            if (column === currentColumn) {
+
+                currentDirection =
+                    currentDirection === "asc"
+                        ? "desc"
+                        : "asc";
+
+            } else {
+
+                currentColumn = column;
+                currentDirection = "desc";
+
+            }
+
+
+            sortPlayers();
+
+            updateIndicators();
+
+        });
+
+    });
+
+
+    function sortPlayers() {
+
+        if (currentColumn === null) {
+            return;
+        }
+
+        const rows = Array.from(
+            tableBody.querySelectorAll("tr")
+        );
+
+
+        rows.sort(function (a, b) {
+
+            const dataKey = currentColumn.replace(
+                /-([a-z])/g,
+                function (_, letter) {
+                    return letter.toUpperCase();
+                }
+            );
+
+            const valueA = a.dataset[dataKey];
+
+            const valueB = b.dataset[dataKey];
+
+
+            const header =
+                document.querySelector(
+                    `th[data-column="${currentColumn}"]`
+                );
+
+
+            const type =
+                header.dataset.type;
+
+
+            let comparison;
+
+
+            if (type === "number") {
+
+                comparison =
+                    parseFloat(valueA || 0)
+                    -
+                    parseFloat(valueB || 0);
+
+            } else {
+
+                comparison =
+                    valueA.localeCompare(
+                        valueB,
+                        "de",
+                        {
+                            sensitivity: "base"
+                        }
+                    );
+
+            }
+
+
+            if (currentDirection === "desc") {
+
+                comparison *= -1;
+
+            }
+
+
+            return comparison;
+
+        });
+
+
+        rows.forEach(function (row) {
+
+            tableBody.appendChild(row);
+
+        });
+
+    }
+
+
+    function updateIndicators() {
+
+        headers.forEach(function (header) {
+
+            const indicator =
+                header.querySelector(
+                    ".sort-indicator"
+                );
+
+            if (
+                header.dataset.column ===
+                currentColumn
+            ) {
+
+                indicator.textContent =
+                    currentDirection === "asc"
+                        ? " ↑"
+                        : " ↓";
+
+            } else {
+
+                indicator.textContent = "";
+
+            }
+
+        });
+
+    }
+
+
+    sortPlayers();
+    updateIndicators();
+
+});
+
+</script>
+
+{% endblock %}

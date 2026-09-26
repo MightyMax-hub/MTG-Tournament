@@ -1,0 +1,86 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<div class="page-header">
+
+    <div>
+        <h1>Turnierserie anlegen</h1>
+    </div>
+
+</div>
+
+
+<div class="form-card">
+
+    {% if error %}
+
+        <div class="error">
+            {{ error }}
+        </div>
+
+    {% endif %}
+
+
+    <form method="post">
+
+        <label for="name">
+            Name der Turnierserie
+        </label>
+
+        <input
+            type="text"
+            id="name"
+            name="name"
+            placeholder="z. B. MTG GP Stolpen 2026"
+            required
+            autofocus
+        >
+
+
+        <label for="description">
+            Beschreibung
+        </label>
+
+        <textarea
+            id="description"
+            name="description"
+            rows="4"
+            placeholder="Optionale Beschreibung"
+        ></textarea>
+
+
+        <label for="start_date">
+            Startdatum
+        </label>
+
+        <input
+            type="date"
+            id="start_date"
+            name="start_date"
+        >
+
+
+        <label for="end_date">
+            Enddatum
+        </label>
+
+        <input
+            type="date"
+            id="end_date"
+            name="end_date"
+        >
+
+
+        <button
+            type="submit"
+            class="primary-button"
+        >
+            Turnierserie anlegen
+        </button>
+
+    </form>
+
+</div>
+
+{% endblock %}
