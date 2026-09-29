@@ -23,6 +23,19 @@ def dashboard():
         """
     ).fetchall()
 
+    series_list = connection.execute(
+        """
+        SELECT
+            s.*,
+            COUNT(DISTINCT t.id) AS tournament_count
+        FROM tournament_series s
+        LEFT JOIN tournaments t
+            ON t.series_id = s.id
+        GROUP BY s.id
+        ORDER BY COALESCE(s.start_date, '') DESC, s.id DESC
+        """
+    ).fetchall()
+
     player_count = connection.execute(
         """
         SELECT COUNT(*) AS count
@@ -36,5 +49,6 @@ def dashboard():
     return render_template(
         "dashboard.html",
         tournaments=tournaments,
+        series_list=series_list,
         player_count=player_count
     )

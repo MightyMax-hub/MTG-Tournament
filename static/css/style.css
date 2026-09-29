@@ -34,46 +34,178 @@ header {
 .header-content {
     max-width: 1200px;
     margin: auto;
-
     display: flex;
-
     justify-content: space-between;
     align-items: center;
-
     gap: 20px;
 }
-
 
 .header-left {
     min-width: 0;
 }
 
-
-.header-title {
-    font-size: 24px;
-    font-weight: bold;
-
-    margin-bottom: 12px;
+.header-brand-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
 }
 
+.header-title {
+    margin-bottom: 12px;
+    font-size: 24px;
+    font-weight: bold;
+}
 
 .header-logo {
     max-height: 70px;
     max-width: 180px;
-
     object-fit: contain;
-
     flex-shrink: 0;
 }
 
+.mobile-menu-toggle,
+.mobile-nav-backdrop {
+    display: none;
+}
 
 nav {
     display: flex;
-    gap: 10px;
-
+    gap: 24px;
     overflow-x: auto;
 }
 
+nav.site-navigation a {
+    color: white;
+    text-decoration: none;
+    padding: 12px 16px;
+    background: #3a4048;
+    border-radius: 8px;
+    white-space: nowrap;
+}
+
+@media (max-width: 600px) {
+    .header-content {
+        align-items: center;
+        gap: 10px;
+    }
+
+    .header-left {
+        flex: 1;
+    }
+
+    .header-title {
+        margin-bottom: 0;
+        font-size: 20px;
+    }
+
+    .header-logo {
+        max-width: 70px;
+        max-height: 50px;
+    }
+
+    .mobile-menu-toggle {
+        display: flex;
+        flex: 0 0 44px;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: 5px;
+        width: 44px;
+        height: 44px;
+        margin: 0;
+        padding: 10px;
+        border: 0;
+        border-radius: 6px;
+        background: #3a4048;
+        cursor: pointer;
+    }
+
+    .mobile-menu-toggle span {
+        display: block;
+        width: 22px;
+        height: 2px;
+        border-radius: 1px;
+        background: white;
+        transition: transform 0.2s ease, opacity 0.2s ease;
+    }
+
+    body.mobile-nav-open .mobile-menu-toggle {
+        position: relative;
+        z-index: 104;
+    }
+
+    body.mobile-nav-open .mobile-menu-toggle span:first-child {
+        transform: translateY(7px) rotate(45deg);
+    }
+
+    body.mobile-nav-open .mobile-menu-toggle span:nth-child(2) {
+        opacity: 0;
+    }
+
+    body.mobile-nav-open .mobile-menu-toggle span:last-child {
+        transform: translateY(-7px) rotate(-45deg);
+    }
+
+    nav.site-navigation {
+        position: fixed;
+        z-index: 102;
+        top: 0;
+        bottom: 0;
+        left: 0;
+        display: flex;
+        flex-direction: column;
+        align-items: stretch;
+        gap: 10px;
+        width: min(82vw, 320px);
+        padding: 76px 18px 18px;
+        overflow-x: hidden;
+        overflow-y: auto;
+        background: #20242a;
+        box-shadow: 4px 0 18px rgba(0, 0, 0, 0.25);
+        transform: translateX(-105%);
+        visibility: hidden;
+        transition: transform 0.22s ease, visibility 0.22s ease;
+    }
+
+    nav.site-navigation a {
+        display: block;
+        padding: 14px 16px;
+    }
+
+    body.mobile-nav-open {
+        overflow: hidden;
+    }
+
+    body.mobile-nav-open nav.site-navigation {
+        transform: translateX(0);
+        visibility: visible;
+    }
+
+    .mobile-nav-backdrop {
+        position: fixed;
+        z-index: 101;
+        inset: 0;
+        display: none;
+        width: 100%;
+        height: 100%;
+        margin: 0;
+        padding: 0;
+        border: 0;
+        border-radius: 0;
+        background: rgba(0, 0, 0, 0.48);
+    }
+
+    body.mobile-nav-open .mobile-nav-backdrop {
+        display: block;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    nav.site-navigation,
+    .mobile-menu-toggle span {
+        transition: none;
+    }
+}
 
 nav a {
     color: white;
@@ -86,24 +218,6 @@ nav a {
     border-radius: 8px;
 
     white-space: nowrap;
-}
-
-
-@media (max-width: 600px) {
-
-    .header-content {
-        align-items: flex-start;
-    }
-
-    .header-logo {
-        max-width: 100px;
-        max-height: 50px;
-    }
-
-    .header-title {
-        font-size: 20px;
-    }
-
 }
 
 
@@ -288,6 +402,18 @@ th {
     text-align: right;
 }
 
+.older-items {
+    margin-top: 16px;
+}
+
+.older-items > summary {
+    padding: 10px 12px;
+    border-radius: 6px;
+    background: #3a4048;
+    color: white;
+    cursor: pointer;
+}
+
 
 .tournament-info {
     display: grid;
@@ -457,6 +583,80 @@ th {
 
 .player-table tbody tr:hover {
     background: #f8fafc;
+}
+
+@media (max-width: 600px) {
+
+    .series-detail-header {
+        align-items: stretch;
+        flex-direction: column;
+    }
+
+    .series-detail-header .round-actions {
+        align-items: stretch;
+        flex-direction: column;
+    }
+
+    .series-detail-header .round-actions a {
+        width: 100%;
+    }
+
+    .tournaments-table th,
+    .tournaments-table td {
+        font-size: 14px;
+    }
+
+    .series-detail-table {
+        min-width: 680px;
+    }
+
+    .series-detail-table th,
+    .series-detail-table td {
+        padding: 8px;
+        font-size: 14px;
+    }
+
+    .series-table {
+        min-width: 0;
+        table-layout: fixed;
+    }
+
+    .series-table th,
+    .series-table td {
+        padding: 8px 4px;
+        font-size: 14px;
+        overflow-wrap: anywhere;
+    }
+
+    .series-table th {
+        white-space: normal;
+    }
+
+    .series-table th:nth-child(1),
+    .series-table td:nth-child(1) {
+        width: 32%;
+    }
+
+    .series-table th:nth-child(2),
+    .series-table td:nth-child(2) {
+        width: 30%;
+    }
+
+    .series-table th:nth-child(3),
+    .series-table td:nth-child(3) {
+        width: 16%;
+    }
+
+    .series-table th:nth-child(4),
+    .series-table td:nth-child(4) {
+        width: 22%;
+    }
+
+    .series-date-range {
+        display: flex;
+        flex-direction: column;
+    }
+
 }
 
 .player-table td:not(:first-child),
@@ -1087,6 +1287,69 @@ th {
     white-space: nowrap;
 }
 
+@media (max-width: 600px) {
+
+    .tournament-current-round {
+        padding: 16px;
+    }
+
+    .tournament-current-round .tournament-round-header {
+        gap: 12px;
+        margin-bottom: 12px;
+    }
+
+    .round-actions.tournament-round-actions {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        align-items: stretch;
+        gap: 6px;
+    }
+
+    .tournament-round-actions form {
+        min-width: 0;
+    }
+
+    .round-actions.tournament-round-actions .primary-button,
+    .round-actions.tournament-round-actions .secondary-button {
+        height: auto;
+        min-width: 0;
+        min-height: 46px;
+        padding: 8px;
+        white-space: normal;
+    }
+
+    .tournament-current-round .match-list {
+        gap: 8px;
+    }
+
+    .tournament-current-round .match-card {
+        grid-template-columns: minmax(0, 1fr) auto;
+        gap: 6px 10px;
+        padding: 12px;
+    }
+
+    .tournament-current-round .table-number {
+        grid-column: 1;
+    }
+
+    .tournament-current-round .match-result {
+        grid-column: 2;
+        grid-row: 1;
+    }
+
+    .tournament-current-round .match-players {
+        grid-column: 1 / -1;
+        flex-wrap: wrap;
+        gap: 8px;
+    }
+
+    .tournament-current-round .match-entry {
+        margin-top: 2px;
+        padding-top: 6px;
+    }
+
+}
+
 .notice-box {
     margin-bottom: 20px;
     padding: 16px 20px;
@@ -1236,15 +1499,16 @@ th {
 .match-entry .game-inputs {
     display: flex;
     align-items: center;
-    gap: 10px;
+    justify-content: center;
+    gap: 6px;
     width: 100%;
 }
 
 .match-entry .game-inputs label {
     display: flex;
     align-items: center;
-    gap: 8px;
-    flex: 1;
+    flex: 0 0 auto;
+    margin: 0;
 }
 
 .match-entry .game-inputs input {
@@ -1259,9 +1523,62 @@ th {
 
 .match-entry .game-colon {
     flex: 0 0 auto;
+    align-self: center;
+    padding-bottom: 0;
+    line-height: 1;
 }
 
 .match-entry .submit-result-button {
     flex: 0 0 auto;
+    margin: 0;
     white-space: nowrap;
+}
+
+@media (max-width: 600px) {
+
+    .past-round-content {
+        padding: 0 8px 12px;
+    }
+
+    .past-round-content .match-card {
+        grid-template-columns: max-content minmax(0, 1fr) max-content;
+        gap: 6px;
+        padding: 8px;
+    }
+
+    .past-round-content .match-players {
+        min-width: 0;
+        flex-wrap: wrap;
+        gap: 4px;
+        font-size: 14px;
+    }
+
+    .past-round-content .match-players strong {
+        min-width: 0;
+        overflow-wrap: anywhere;
+    }
+
+    .past-round-content .match-result {
+        text-align: right;
+        white-space: nowrap;
+    }
+
+    .past-round-content .match-entry .game-inputs {
+        gap: 4px;
+    }
+
+    .past-round-content .match-entry .game-inputs input {
+        width: 54px;
+        min-width: 54px;
+        height: 42px;
+        padding: 6px;
+        font-size: 16px;
+    }
+
+    .past-round-content .match-entry .submit-result-button {
+        min-height: 42px;
+        padding: 8px 10px;
+        font-size: 12px;
+    }
+
 }

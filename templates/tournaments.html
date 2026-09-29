@@ -2,7 +2,21 @@
 
 {% block content %}
 
-<h1>Turniere</h1>
+<div class="page-header">
+
+    <div>
+        <h1>Turniere</h1>
+        <p>Verwalte deine Turniere und plane neue Events.</p>
+    </div>
+
+    <a
+        href="{{ url_for('tournaments.new_tournament') }}"
+        class="primary-button"
+    >
+        + Neues Turnier
+    </a>
+
+</div>
 
 {% if show_form %}
 
@@ -80,17 +94,9 @@
 {% endif %}
 
 
-<a
-    class="button primary"
-    href="{{ url_for('tournaments.new_tournament') }}"
->
-    + Neues Turnier
-</a>
-
-
 <div class="table-container">
 
-<table>
+<table class="tournaments-table">
 
 <thead>
 

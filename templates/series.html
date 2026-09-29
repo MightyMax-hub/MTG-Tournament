@@ -21,7 +21,14 @@
 
 <div class="table-container">
 
-    <table class="player-table">
+    <table class="player-table series-table">
+
+        <colgroup>
+            <col>
+            <col>
+            <col>
+            <col>
+        </colgroup>
 
         <thead>
             <tr>
@@ -59,11 +66,13 @@
 
                     {% if item.start_date %}
 
-                        {{ item.start_date }}
+                        <span class="series-date-range">
+                            <span>{{ item.start_date }}</span>
 
-                        {% if item.end_date %}
-                            – {{ item.end_date }}
-                        {% endif %}
+                            {% if item.end_date %}
+                                <span>– {{ item.end_date }}</span>
+                            {% endif %}
+                        </span>
 
                     {% else %}
 

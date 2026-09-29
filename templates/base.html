@@ -28,29 +28,43 @@
 
         <div class="header-left">
 
-            <div class="header-title">
-                MTG Tournament Manager
+            <div class="header-brand-row">
+                <button
+                    class="mobile-menu-toggle"
+                    type="button"
+                    aria-label="Menü öffnen"
+                    aria-controls="site-navigation"
+                    aria-expanded="false"
+                >
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                </button>
+
+                <div class="header-title">
+                    MTG Tournament Manager
+                </div>
             </div>
 
-            <nav>
+            <nav id="site-navigation" class="site-navigation" aria-label="Hauptnavigation">
 
-    		<a href="{{ url_for('main.dashboard') }}">
-        		Dashboard
-    		</a>
+                <a href="{{ url_for('main.dashboard') }}">
+                    Dashboard
+                </a>
 
-    		<a href="{{ url_for('players.list_players') }}">
-        		Spieler
-    		</a>
+                <a href="{{ url_for('players.list_players') }}">
+                    Spieler
+                </a>
 
-    		<a href="{{ url_for('series.list_series') }}">
-        		Turnierserien
-    		</a>
+                <a href="{{ url_for('series.list_series') }}">
+                    Turnierserien
+                </a>
 
-    		<a href="{{ url_for('tournaments.list_tournaments') }}">
-        		Turniere
-    		</a>
+                <a href="{{ url_for('tournaments.list_tournaments') }}">
+                    Turniere
+                </a>
 
-	   </nav>
+            </nav>
 
         </div>
 
@@ -63,6 +77,14 @@
 
     </div>
 
+    <button
+        class="mobile-nav-backdrop"
+        type="button"
+        aria-label="Menü schließen"
+        aria-hidden="true"
+        tabindex="-1"
+    ></button>
+
 </header>
 
 
@@ -72,6 +94,53 @@
 {% endblock %}
 
 </main>
+
+<script>
+    const mobileNavigation = window.matchMedia("(max-width: 600px)");
+    const menuToggle = document.querySelector(".mobile-menu-toggle");
+    const siteNavigation = document.querySelector(".site-navigation");
+    const menuBackdrop = document.querySelector(".mobile-nav-backdrop");
+
+    function setMobileMenuOpen(isOpen, returnFocus = false) {
+        isOpen = isOpen && mobileNavigation.matches;
+        document.body.classList.toggle("mobile-nav-open", isOpen);
+        menuToggle.setAttribute("aria-expanded", String(isOpen));
+        menuToggle.setAttribute(
+            "aria-label",
+            isOpen ? "Menü schließen" : "Menü öffnen"
+        );
+        siteNavigation.setAttribute(
+            "aria-hidden",
+            String(mobileNavigation.matches && !isOpen)
+        );
+        menuBackdrop.setAttribute("aria-hidden", String(!isOpen));
+
+        if (returnFocus) {
+            menuToggle.focus();
+        }
+    }
+
+    menuToggle.addEventListener("click", () => {
+        setMobileMenuOpen(!document.body.classList.contains("mobile-nav-open"));
+    });
+
+    menuBackdrop.addEventListener("click", () => {
+        setMobileMenuOpen(false, true);
+    });
+
+    siteNavigation.querySelectorAll("a").forEach((link) => {
+        link.addEventListener("click", () => setMobileMenuOpen(false));
+    });
+
+    document.addEventListener("keydown", (event) => {
+        if (event.key === "Escape") {
+            setMobileMenuOpen(false, true);
+        }
+    });
+
+    mobileNavigation.addEventListener("change", () => setMobileMenuOpen(false));
+    setMobileMenuOpen(false);
+</script>
 
 </body>
 </html>

@@ -23,52 +23,103 @@
 
 
     <div class="card">
+        <h2>Turnierserien</h2>
 
+        {% if series_list %}
+            {% for item in series_list[:5] %}
+                <a
+                    class="tournament-link"
+                    href="{{ url_for('series.show_series', series_id=item.id) }}"
+                >
+                    <div class="tournament-link-main">
+                        <strong>{{ item.name }}</strong>
+                        <span>{{ item.tournament_count }} Turniere</span>
+                    </div>
+                    <div class="tournament-link-meta">
+                        <span>{{ item.start_date or 'Kein Startdatum' }}</span>
+                        <span>
+                            {% if item.status == "planned" %}geplant
+                            {% elif item.status == "running" %}aktiv
+                            {% elif item.status == "finished" %}beendet
+                            {% else %}{{ item.status }}{% endif %}
+                        </span>
+                    </div>
+                </a>
+            {% endfor %}
+
+            {% if series_list|length > 5 %}
+                <details class="older-items">
+                    <summary>Ältere Turnierserien</summary>
+                    {% for item in series_list[5:] %}
+                        <a
+                            class="tournament-link"
+                            href="{{ url_for('series.show_series', series_id=item.id) }}"
+                        >
+                            <div class="tournament-link-main">
+                                <strong>{{ item.name }}</strong>
+                                <span>{{ item.tournament_count }} Turniere</span>
+                            </div>
+                            <div class="tournament-link-meta">
+                                <span>{{ item.start_date or 'Kein Startdatum' }}</span>
+                                <span>
+                                    {% if item.status == "planned" %}geplant
+                                    {% elif item.status == "running" %}aktiv
+                                    {% elif item.status == "finished" %}beendet
+                                    {% else %}{{ item.status }}{% endif %}
+                                </span>
+                            </div>
+                        </a>
+                    {% endfor %}
+                </details>
+            {% endif %}
+        {% else %}
+            <p>Noch keine Turnierserien.</p>
+        {% endif %}
+    </div>
+
+    <div class="card">
         <h2>Turniere</h2>
 
         {% if tournaments %}
-
-            {% for tournament in tournaments %}
-
+            {% for tournament in tournaments[:5] %}
                 <a
                     class="tournament-link"
-                    href="{{
-                        url_for(
-                            'tournaments.tournament',
-                            tournament_id=tournament.id
-                        )
-                    }}"
+                    href="{{ url_for('tournaments.tournament', tournament_id=tournament.id) }}"
                 >
                     <div class="tournament-link-main">
-                        <strong>
-                            {{ tournament.name }}
-                        </strong>
-
-                        <span>
-                            {{ tournament.format }}
-                        </span>
+                        <strong>{{ tournament.name }}</strong>
+                        <span>{{ tournament.format }}</span>
                     </div>
-
                     <div class="tournament-link-meta">
-                        <span>
-                            {{ tournament.tournament_date }}
-                        </span>
-
-                        <span>
-                            {{ tournament.series_name or '' }}
-                        </span>
+                        <span>{{ tournament.tournament_date }}</span>
+                        <span>{{ tournament.series_name or '' }}</span>
                     </div>
-
                 </a>
-
             {% endfor %}
 
+            {% if tournaments|length > 5 %}
+                <details class="older-items">
+                    <summary>Ältere Turniere</summary>
+                    {% for tournament in tournaments[5:] %}
+                        <a
+                            class="tournament-link"
+                            href="{{ url_for('tournaments.tournament', tournament_id=tournament.id) }}"
+                        >
+                            <div class="tournament-link-main">
+                                <strong>{{ tournament.name }}</strong>
+                                <span>{{ tournament.format }}</span>
+                            </div>
+                            <div class="tournament-link-meta">
+                                <span>{{ tournament.tournament_date }}</span>
+                                <span>{{ tournament.series_name or '' }}</span>
+                            </div>
+                        </a>
+                    {% endfor %}
+                </details>
+            {% endif %}
         {% else %}
-
             <p>Noch keine Turniere.</p>
-
         {% endif %}
-
     </div>
 
 </div>
