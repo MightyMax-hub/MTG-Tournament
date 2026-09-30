@@ -1056,6 +1056,43 @@ th {
     word-break: break-word;
 }
 
+@media (max-width: 600px) {
+    .seating-page-header {
+        align-items: stretch;
+        flex-direction: column;
+    }
+
+    .seating-page-header .round-actions {
+        align-items: stretch;
+        flex-direction: column;
+    }
+
+    .seating-page-header .round-actions a {
+        width: 100%;
+        font-size: 18px;
+    }
+
+    .table-center {
+        width: 140px;
+        height: 80px;
+        font-size: 18px;
+    }
+
+    .table-center small {
+        margin-top: 3px;
+        font-size: 14px;
+    }
+
+    .seat {
+        left: calc(
+            50% + sin(var(--seat-angle)) * 140px
+        );
+        top: calc(
+            50% - cos(var(--seat-angle)) * 190px
+        );
+    }
+}
+
 
 .match-entry {
     grid-column: 1 / -1;
