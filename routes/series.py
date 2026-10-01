@@ -188,6 +188,15 @@ def show_series(series_id):
         (series_id,)
     ).fetchall()
 
+    available_tournaments = connection.execute(
+        """
+        SELECT id, name, tournament_date, format
+        FROM tournaments
+        WHERE series_id IS NULL
+        ORDER BY tournament_date DESC, id DESC
+        """
+    ).fetchall()
+
     series_players = connection.execute(
         """
         SELECT
@@ -230,6 +239,7 @@ def show_series(series_id):
         "series_detail.html",
         series=series_data,
         tournaments=tournaments,
+        available_tournaments=available_tournaments,
         series_players=series_players,
         available_players=available_players
     )
@@ -667,6 +677,111 @@ def remove_player(series_id):
             )
         )
 
+        connection.commit()
+        connection.close()
+
+    return redirect(
+        url_for(
+            "series.show_series",
+            series_id=series_id
+        )
+    )
+
+
+@series.route(
+    "/<int:series_id>/add-tournament",
+    methods=["POST"]
+)
+def add_tournament(series_id):
+
+    tournament_id = request.form.get(
+        "tournament_id",
+        ""
+    ).strip()
+
+    if tournament_id:
+
+        connection = get_connection()
+
+        try:
+            tournament_id = int(tournament_id)
+        except ValueError:
+            connection.close()
+            return redirect(
+                url_for("series.show_series", series_id=series_id)
+            )
+
+        cursor = connection.execute(
+            """
+            UPDATE tournaments
+            SET series_id = ?
+            WHERE id = ?
+              AND series_id IS NULL
+            """,
+            (series_id, tournament_id)
+        )
+
+        if cursor.rowcount:
+            connection.execute(
+                """
+                INSERT OR IGNORE INTO tournament_players
+                (
+                    tournament_id,
+                    player_id
+                )
+                SELECT ?, player_id
+                FROM series_players
+                WHERE series_id = ?
+                """,
+                (tournament_id, series_id)
+            )
+            update_series_status(connection, series_id)
+
+        connection.commit()
+        connection.close()
+
+    return redirect(
+        url_for(
+            "series.show_series",
+            series_id=series_id
+        )
+    )
+
+
+@series.route(
+    "/<int:series_id>/remove-tournament",
+    methods=["POST"]
+)
+def remove_tournament(series_id):
+
+    tournament_id = request.form.get(
+        "tournament_id",
+        ""
+    ).strip()
+
+    if tournament_id:
+
+        connection = get_connection()
+
+        try:
+            tournament_id = int(tournament_id)
+        except ValueError:
+            connection.close()
+            return redirect(
+                url_for("series.show_series", series_id=series_id)
+            )
+
+        connection.execute(
+            """
+            UPDATE tournaments
+            SET series_id = NULL
+            WHERE id = ?
+              AND series_id = ?
+            """,
+            (tournament_id, series_id)
+        )
+
+        update_series_status(connection, series_id)
         connection.commit()
         connection.close()
 

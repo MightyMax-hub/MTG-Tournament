@@ -575,6 +575,10 @@ th {
     border-bottom: 1px solid #e5e5e5;
 }
 
+.series-detail-table td {
+    vertical-align: middle;
+}
+
 .player-table th {
     background: #f4f6f8;
     font-weight: bold;
@@ -799,12 +803,21 @@ th {
     border-radius: 7px;
 }
 
+.player-list-item form,
+.series-detail-table td:last-child form {
+    max-width: none;
+    margin: 0;
+    padding: 0;
+    background: transparent;
+}
+
 .danger-button {
     padding: 7px 12px;
     background: #c0392b;
     color: white;
     border: none;
     border-radius: 6px;
+    margin-top: 0;
     cursor: pointer;
 }
 
